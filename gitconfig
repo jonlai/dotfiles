@@ -1,0 +1,15 @@
+[credential]
+    helper = osxkeychain
+[user]
+    name = Jon Lai
+    email = jonathan@jonlai.com
+[core]
+    editor = vim
+    excludesfile = ~/.gitignore
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    rpull = pull --rebase
+    branch-name = rev-parse --abbrev-ref HEAD
+    pusho = "!git push --set-upstream origin $(git branch-name)"
