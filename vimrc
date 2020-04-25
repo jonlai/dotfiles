@@ -2,20 +2,16 @@ set nocompatible
 call plug#begin('~/.vim/plugged')
 
 Plug 'airblade/vim-gitgutter'
-Plug 'bling/vim-bufferline'
+Plug 'dense-analysis/ale'
 Plug 'easymotion/vim-easymotion'
-Plug 'ervandew/supertab'
 Plug 'itchyny/lightline.vim'
-Plug '/usr/local/opt/fzf'
+Plug 'jonlai/smyth.vim'
 Plug 'junegunn/fzf.vim'
-Plug 'jonlai/smyck-vim'
+Plug 'mengelbrecht/lightline-bufferline'
+Plug 'sheerun/vim-polyglot'
 Plug 'tomtom/tcomment_vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-sleuth'
-Plug 'w0rp/ale'
-" filetype-specific plugins
-Plug 'jonlai/yajs.vim'
-Plug 'mxw/vim-jsx'
 
 call plug#end()
 
@@ -29,6 +25,8 @@ set nofoldenable
 set hidden
 set hlsearch
 set incsearch
+set wildmenu
+set updatetime=500
 set clipboard=unnamed
 
 " indentation
@@ -43,14 +41,9 @@ set backspace=indent,eol,start
 " line numbering
 set number
 set relativenumber
+set cursorline
+set cursorlineopt=number
 autocmd InsertEnter,InsertLeave * :set invrelativenumber
-
-" color scheme
-set t_Co=256
-colorscheme smyck
-set colorcolumn=81,101
-highlight ColorColumn ctermbg=236
-highlight SignColumn cterm=NONE ctermbg=NONE
 
 " mappings
 let mapleader=' '
@@ -60,6 +53,7 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap <leader>p :set invpaste<cr>
 nnoremap <leader>q :bd<cr>
+nnoremap <leader>h :echo synIDattr(synID(line('.'), col('.'), 1), 'name')<cr>
 nnoremap <c-j> :bp<cr>
 nnoremap <c-k> :bn<cr>
 inoremap <c-j> <esc>:bp<cr>
@@ -67,111 +61,110 @@ inoremap <c-k> <esc>:bn<cr>
 vnoremap <c-j> <esc>:bp<cr>
 vnoremap <c-k> <esc>:bn<cr>
 
-" gitgutter
-let g:gitgutter_async = 0
+" jonlai/smyth.vim
+if exists('+termguicolors')
+  let &t_8f = "\<esc>[38;2;%lu;%lu;%lum"
+  let &t_8b = "\<esc>[48;2;%lu;%lu;%lum"
+  set termguicolors
+endif
+set colorcolumn=81,101
+colorscheme smyth
 
-" easymotion
+" easymotion/vim-easymotion
 map <leader> <plug>(easymotion-prefix)
 
-" tcomment
+" tomtom/tcomment_vim
 nnoremap <silent> <leader>x :TComment<cr>
 vnoremap <silent> <leader>x :TComment<cr>
 
-" fzf
+" junegunn/fzf.vim
+set rtp+=~/.fzf
 cnoreabbrev fzf FZF
 nnoremap <silent> <leader>l :Lines<cr>
 nnoremap <silent> <leader>d :GFiles<cr>
 nnoremap <silent> <leader>c :BCommits<cr>
 
-" ale
+" sheerun/vim-polyglot
+let g:javascript_plugin_jsdoc = 1
+
+" dense-analysis/ale
 let g:ale_set_balloons = 0
 let g:ale_set_highlights = 0
 let g:ale_sign_error = '✘❯'
 let g:ale_sign_warning = '▲❯'
 let g:ale_sign_style_error = '✘❯'
 let g:ale_sign_style_warning = '▲❯'
-highlight ALEErrorSign ctermfg=0 ctermbg=9
-highlight ALEWarningSign ctermfg=0 ctermbg=11
-highlight ALEStyleErrorSign ctermfg=0 ctermbg=9
-highlight ALEStyleWarningSign ctermfg=0 ctermbg=11
-
-" linters/fixers/ignores
 let g:ale_linters = {
-\     'javascript': ['eslint'],
-\     'bash': ['shellcheck'],
-\     'zsh': ['shellcheck'],
-\     'sh': ['shellcheck']
-\   }
+\ 'javascript': ['eslint'],
+\ 'rust': ['cargo'],
+\ 'bash': ['shellcheck'],
+\ 'zsh': ['shellcheck'],
+\ 'sh': ['shellcheck']
+\}
 let g:ale_fixers = {
-\     'javascript': ['prettier']
-\   }
+\ 'javascript': ['prettier'],
+\ 'rust': ['rustfmt']
+\}
 let g:ale_pattern_options = {
-\     '\.min\.js$': { 'ale_linters': [], 'ale_fixers': [] },
-\     '\.min\.css$': { 'ale_linters': [], 'ale_fixers': [] }
-\   }
+\ '\.min\.js$': { 'ale_linters': [], 'ale_fixers': [] },
+\ '\.min\.css$': { 'ale_linters': [], 'ale_fixers': [] }
+\}
 let g:ale_sh_shellcheck_exclusions = 'SC2148'
 
-" bufferline
+" mengelbrecht/lightline-bufferline
 set showtabline=2
-let g:bufferline_echo = 0
-let g:bufferline_show_bufnr = 0
-let g:bufferline_modified = '✱'
-let g:bufferline_active_buffer_left = '❮'
-let g:bufferline_active_buffer_right =  '❯'
+let g:lightline#bufferline#filename_modifier = ':~:.'
+let g:lightline#bufferline#modified = '✱'
+let g:lightline#bufferline#read_only = ''
+let g:netrw_fastbrowse = 0
+autocmd FileType netrw setl bufhidden=wipe
 
-" lightline
+" itchyny/lightline.vim
 set noshowmode
 set timeoutlen=1000
 set ttimeoutlen=0
 set laststatus=2
 let g:lightline = {
-\     'active': {
-\       'left': [
-\         ['mode', 'paste', 'alestatus'],
-\         ['readonly', 'fugitive', 'modified']
-\       ],
-\       'right': [ ['lineinfo'], ['percent'], ['fileformat', 'filetype'] ]
-\     },
-\     'tabline': {
-\       'left': [ ['bufferline'] ],
-\       'right': [ ['fileencoding'] ]
-\     },
-\     'component': {
-\       'fileformat': '%{winwidth(0) > 70 ? &fileformat : ""}',
-\       'lineinfo': "\ue0a1%3l:%-2v",
-\       'readonly': '%{&ft !~? "help" && &readonly ? "\ue0a2" : ""}'
-\     },
-\     'component_visible_condition': {
-\       'fileformat': 'winwidth(0) > 70'
-\     },
-\     'component_function': {
-\       'bufferline': 'LightlineBufferline',
-\       'fugitive': 'LightlineFugitive',
-\       'alestatus': 'LightlineALEStatus'
-\     }
-\   }
-
-" displays a buffer-list using vim-bufferline in lightline's tabline
-fu! LightlineBufferline()
-  call bufferline#refresh_status()
-  return join([
-\          g:bufferline_status_info.before,
-\          g:bufferline_status_info.current,
-\          g:bufferline_status_info.after
-\        ], '')
-endfu
+\ 'active': {
+\   'left': [
+\     ['mode', 'paste', 'alestatus'],
+\     ['readonly', 'fugitive', 'modified'],
+\   ],
+\   'right': [['lineinfo'], ['percent'], ['fileformat', 'filetype']],
+\ },
+\ 'colorscheme': 'powerline',
+\ 'component': {
+\   'fileformat': '%{winwidth(0) > 70 ? &fileformat : ""}',
+\   'lineinfo': "\u2632 %3l:%-2v",
+\   'readonly': '%{&ft !~? "help" && &readonly ? "\xf0\x9f\x94\x92" : ""}'
+\ },
+\ 'component_expand': { 'buffers': 'lightline#bufferline#buffers' },
+\ 'component_function': {
+\   'fugitive': 'LightlineFugitive',
+\   'alestatus': 'LightlineALEStatus',
+\ },
+\ 'component_type': { 'buffers': 'tabsel' },
+\ 'component_visible_condition': { 'fileformat': 'winwidth(0) > 70' },
+\ 'tabline': { 'left': [['buffers']], 'right': [['fileencoding']] },
+\ 'tabline_subseparator': { 'left': '', 'right': '' },
+\}
+let s:palette = g:lightline#colorscheme#{g:lightline.colorscheme}#palette
+let s:palette.tabline.left = [['#8a8a8a', '#303030', 245, 236]]
+let s:palette.tabline.middle = [['#8a8a8a', '#303030', 245, 236]]
+let s:palette.tabline.tabsel = [['#262626', '#8787af', 235, 103]]
 
 " displays current git branch in lightline using vim-fugitive
 fu! LightlineFugitive()
-  if exists('*fugitive#head')
-    return fugitive#head() !=# '' ? "\ue0a0 ".fugitive#head() : ''
+  if exists('*FugitiveHead')
+    let branch = FugitiveHead()
+    return branch !=# '' ? "\u16A0 " . branch : ''
   endif
   return ''
 endfu
 
 " displays '$' or 'F' in lightline when ale is disabled or fix-enabled
 fu! LightlineALEStatus()
-  let is_ale_enabled = get(b:, 'ale_enabled', 1) && g:ale_enabled
+  let is_ale_enabled = get(b:, 'ale_enabled', 1) && get(g:, 'ale_enabled', 0)
   return is_ale_enabled ? (get(b:, 'ale_fix_on_save') ? 'Ｆ' : '') : '＄'
 endfu
 nnoremap <silent> <leader>a :call ale#toggle#Toggle()<cr>
@@ -201,6 +194,4 @@ fu! StripTrailingWhitespace()
   %s/\s\+$//e
   call cursor(l, c)
 endfu
-highlight TrailingWhitespace ctermfg=7 ctermbg=7
-autocmd FileType markdown syn match TrailingWhitespace /\s\+$/
 autocmd BufWritePre * :call StripTrailingWhitespace()
