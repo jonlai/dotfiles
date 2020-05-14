@@ -7,7 +7,12 @@ Plug 'easymotion/vim-easymotion'
 Plug 'itchyny/lightline.vim'
 Plug 'jonlai/smyth.vim'
 Plug 'junegunn/fzf.vim'
+Plug 'mattn/vim-lsp-settings'
 Plug 'mengelbrecht/lightline-bufferline'
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/vim-lsp'
 Plug 'sheerun/vim-polyglot'
 Plug 'tomtom/tcomment_vim'
 Plug 'tpope/vim-fugitive'
@@ -87,27 +92,67 @@ nnoremap <silent> <leader>c :BCommits<cr>
 " sheerun/vim-polyglot
 let g:javascript_plugin_jsdoc = 1
 
+" airblade/vim-gitgutter
+let g:gitgutter_sign_priority = 5
+
+" prabirshrestha/asyncomplete.vim
+set pumheight=15
+let g:asyncomplete_min_chars = 3
+inoremap <expr> <tab>   pumvisible() ? '<c-n>' : '<tab>'
+inoremap <expr> <s-tab> pumvisible() ? '<c-p>' : '<s-tab>'
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : '<cr>'
+
+" prabirshrestha/vim-lsp
+let g:lsp_diagnostics_echo_cursor = 1
+let g:lsp_diagnostics_echo_delay = 0
+let g:lsp_textprop_enabled = 0
+let g:lsp_semantic_enabled = 0
+let g:lsp_signs_error = { 'text': '✘❯' }
+let g:lsp_signs_warning = { 'text': '▲❯' }
+let g:lsp_signs_information = { 'text': '◆❯' }
+let g:lsp_signs_hint = { 'text': '◆❯' }
+let g:lsp_signs_priority = 20
+fu! LspBufferMappings() abort
+  nmap <silent> <buffer> gd <plug>(lsp-definition)
+  nmap <silent> <buffer> gi <plug>(lsp-implementation)
+  nmap <silent> <buffer> gr <plug>(lsp-references)
+  nmap <silent> <buffer> gn <plug>(lsp-next-diagnostic)
+  nmap <silent> <buffer> gp <plug>(lsp-previous-diagnostic)
+endfu
+augroup lsp_install
+  au!
+  autocmd User lsp_buffer_enabled call LspBufferMappings()
+augroup end
+
+" mattn/vim-lsp-settings
+let g:lsp_settings_servers_dir = expand($HOME) . '/.lsp/servers'
+let g:lsp_settings_filetype_javascript =
+\ ['typescript-language-server', 'eslint-language-server']
+let g:lsp_settings_filetype_typescript = g:lsp_settings_filetype_javascript
+
 " dense-analysis/ale
+let g:ale_echo_msg_format = 'ALE: %[code] %%s'
+let g:ale_linters_explicit = 1
 let g:ale_set_balloons = 0
 let g:ale_set_highlights = 0
+let g:ale_sign_priority = 15
 let g:ale_sign_error = '✘❯'
 let g:ale_sign_warning = '▲❯'
 let g:ale_sign_style_error = '✘❯'
 let g:ale_sign_style_warning = '▲❯'
 let g:ale_linters = {
-\ 'javascript': ['eslint'],
-\ 'rust': ['cargo'],
 \ 'bash': ['shellcheck'],
+\ 'rust': ['cargo'],
+\ 'sh': ['shellcheck'],
 \ 'zsh': ['shellcheck'],
-\ 'sh': ['shellcheck']
 \}
 let g:ale_fixers = {
 \ 'javascript': ['prettier'],
-\ 'rust': ['rustfmt']
+\ 'rust': ['rustfmt'],
 \}
 let g:ale_pattern_options = {
 \ '\.min\.js$': { 'ale_linters': [], 'ale_fixers': [] },
-\ '\.min\.css$': { 'ale_linters': [], 'ale_fixers': [] }
+\ '\.min\.css$': { 'ale_linters': [], 'ale_fixers': [] },
 \}
 let g:ale_sh_shellcheck_exclusions = 'SC2148'
 
@@ -163,6 +208,7 @@ fu! LightlineFugitive()
 endfu
 
 " displays '$' or 'F' in lightline when ale is disabled or fix-enabled
+" TODO: update status and toggle to reflect LSP diagnostics too
 fu! LightlineALEStatus()
   let is_ale_enabled = get(b:, 'ale_enabled', 1) && get(g:, 'ale_enabled', 0)
   return is_ale_enabled ? (get(b:, 'ale_fix_on_save') ? 'Ｆ' : '') : '＄'
