@@ -58,7 +58,8 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap <leader>p :set invpaste<cr>
 nnoremap <leader>q :bd<cr>
-nnoremap <leader>h :echo synIDattr(synID(line('.'), col('.'), 1), 'name')<cr>
+nnoremap <leader>n :echo synIDattr(synID(line('.'), col('.'), 1), 'name')<cr>
+nnoremap <expr> <leader>h (&hls && v:hlsearch ? ':noh' : ':set hls').'<cr>'
 nnoremap <c-j> :bp<cr>
 nnoremap <c-k> :bn<cr>
 inoremap <c-j> <esc>:bp<cr>
@@ -79,6 +80,7 @@ colorscheme smyth
 map <leader> <plug>(easymotion-prefix)
 
 " tomtom/tcomment_vim
+let g:tcomment_maps = 0
 nnoremap <silent> <leader>x :TComment<cr>
 vnoremap <silent> <leader>x :TComment<cr>
 
@@ -93,6 +95,7 @@ nnoremap <silent> <leader>c :BCommits<cr>
 let g:javascript_plugin_jsdoc = 1
 
 " airblade/vim-gitgutter
+let g:gitgutter_map_keys = 0
 let g:gitgutter_sign_priority = 5
 
 " prabirshrestha/asyncomplete.vim
