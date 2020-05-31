@@ -199,7 +199,7 @@ let g:lightline = {
 let s:palette = g:lightline#colorscheme#{g:lightline.colorscheme}#palette
 let s:palette.tabline.left = [['#8a8a8a', '#303030', 245, 236]]
 let s:palette.tabline.middle = [['#8a8a8a', '#303030', 245, 236]]
-let s:palette.tabline.tabsel = [['#262626', '#8787af', 235, 103]]
+let s:palette.tabline.tabsel = [['#1C1C1C', '#A67EA1', 234, 5]]
 
 " displays current git branch in lightline using vim-fugitive
 fu! LightlineFugitive()
