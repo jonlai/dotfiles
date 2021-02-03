@@ -1,3 +1,5 @@
+# shellcheck disable=SC1090 # global disable
+
 # general settings
 stty -ixon
 export PAGER='less'
@@ -12,6 +14,7 @@ if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
 fi
 source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
+# shellcheck disable=SC2034,SC2154
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
 # plugins
@@ -19,8 +22,12 @@ zinit snippet OMZ::lib/completion.zsh
 zinit snippet OMZ::lib/git.zsh
 zinit snippet OMZ::lib/theme-and-appearance.zsh
 zinit light zsh-users/zsh-syntax-highlighting
-zinit ice from'gh-r' as'program' mv'ripgrep* -> ripgrep' pick'ripgrep/rg'
+zinit ice from'gh-r' as'program' mv'ripgrep* -> dist' pick'dist/rg'
 zinit light BurntSushi/ripgrep
+zinit ice from'gh-r' as'program' mv'shellcheck* -> dist' pick'dist/shellcheck'
+zinit light koalaman/shellcheck
+zinit ice from'gh-r' as'program' mv'shfmt* -> shfmt'
+zinit light mvdan/sh
 
 # fzf
 if [[ ! -f $HOME/.fzf/bin/fzf ]]; then
@@ -60,6 +67,7 @@ bindkey '^a' beginning-of-line
 bindkey '^e' end-of-line
 bindkey '^h' backward-delete-char
 
+# shellcheck disable=SC2154
 if [[ "${terminfo[kcuu1]}" != '' ]]; then
   autoload -U up-line-or-beginning-search
   zle -N up-line-or-beginning-search
@@ -71,7 +79,8 @@ if [[ "${terminfo[kcud1]}" != '' ]]; then
   bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
 fi
 
-# prompt
+# shellcheck disable=SC1087,SC2016,SC2034,SC2154 # prompt/lscolors
+{
 ind='❯❯'
 rtc="%(?:%{$fg_bold[green]%}:%{$fg_bold[red]%})"
 PROMPT=' %{$fg_bold[cyan]%}%c $(git_prompt_info)${rtc}${ind}%{$reset_color%} '
@@ -79,6 +88,9 @@ ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%})%{$fg[yellow]%}✗ "
 ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[blue]%}) "
+export LSCOLORS='Gxfxcxdxbxegedabagacad'
+export LS_COLORS='di=1;36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+}
 
 if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
   function zle-line-init() {
@@ -90,6 +102,7 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
     echoti rmkx
   }
   function zle-keymap-select() {
+    # shellcheck disable=SC2034
     ind="${${KEYMAP/vicmd/𝙑𝙄}/(main|viins)/❯❯}"
     zle reset-prompt
   }

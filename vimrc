@@ -1,8 +1,17 @@
 set nocompatible
+
+" automatically install vim-plug if it does not exist
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+\   https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+" initialize vim plugins using vim-plug
 call plug#begin('~/.vim/plugged')
 
 Plug 'airblade/vim-gitgutter'
-Plug 'dense-analysis/ale'
+Plug 'christoomey/vim-tmux-navigator'
 Plug 'easymotion/vim-easymotion'
 Plug 'itchyny/lightline.vim'
 Plug 'jonlai/smyth.vim'
@@ -14,6 +23,7 @@ Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'sheerun/vim-polyglot'
+Plug 'thecontinium/asyncomplete-buffer.vim'
 Plug 'tomtom/tcomment_vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-sleuth'
@@ -32,12 +42,10 @@ set hlsearch
 set incsearch
 set wildmenu
 set updatetime=500
+set colorcolumn=81,101
 set clipboard=unnamed
 
 " indentation
-set shiftwidth=4
-set tabstop=4
-set softtabstop=4
 set shiftround
 set expandtab
 set autoindent
@@ -73,7 +81,6 @@ if exists('+termguicolors')
   let &t_8b = "\<esc>[48;2;%lu;%lu;%lum"
   set termguicolors
 endif
-set colorcolumn=81,101
 colorscheme smyth
 
 " easymotion/vim-easymotion
@@ -90,6 +97,21 @@ cnoreabbrev fzf FZF
 nnoremap <silent> <leader>l :Lines<cr>
 nnoremap <silent> <leader>d :GFiles<cr>
 nnoremap <silent> <leader>c :BCommits<cr>
+
+" christoomey/vim-tmux-navigator
+let g:tmux_navigator_no_mappings = 1
+nmap <c-@> <c-space>
+imap <c-@> <c-space>
+nnoremap <silent> <c-space>h :TmuxNavigateLeft<cr>
+nnoremap <silent> <c-space>j :TmuxNavigateDown<cr>
+nnoremap <silent> <c-space>k :TmuxNavigateUp<cr>
+nnoremap <silent> <c-space>l :TmuxNavigateRight<cr>
+nnoremap <silent> <c-space>x <c-w>q
+inoremap <silent> <c-space>h <esc>:TmuxNavigateLeft<cr>
+inoremap <silent> <c-space>j <esc>:TmuxNavigateDown<cr>
+inoremap <silent> <c-space>k <esc>:TmuxNavigateUp<cr>
+inoremap <silent> <c-space>l <esc>:TmuxNavigateRight<cr>
+inoremap <silent> <c-space>x <esc><c-w>q
 
 " sheerun/vim-polyglot
 let g:javascript_plugin_jsdoc = 1
@@ -108,56 +130,39 @@ inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : '<cr>'
 " prabirshrestha/vim-lsp
 let g:lsp_diagnostics_echo_cursor = 1
 let g:lsp_diagnostics_echo_delay = 0
-let g:lsp_textprop_enabled = 0
+let g:lsp_diagnostics_signs_error = { 'text': '✘❯' }
+let g:lsp_diagnostics_signs_hint = { 'text': '◆❯' }
+let g:lsp_diagnostics_signs_information = { 'text': '◆❯' }
+let g:lsp_diagnostics_signs_warning = { 'text': '▲❯' }
+let g:lsp_diagnostics_signs_priority = 10
+let g:lsp_log_file = ''
 let g:lsp_semantic_enabled = 0
-let g:lsp_signs_error = { 'text': '✘❯' }
-let g:lsp_signs_warning = { 'text': '▲❯' }
-let g:lsp_signs_information = { 'text': '◆❯' }
-let g:lsp_signs_hint = { 'text': '◆❯' }
-let g:lsp_signs_priority = 20
-fu! LspBufferMappings() abort
-  nmap <silent> <buffer> gd <plug>(lsp-definition)
-  nmap <silent> <buffer> gi <plug>(lsp-implementation)
-  nmap <silent> <buffer> gr <plug>(lsp-references)
-  nmap <silent> <buffer> gn <plug>(lsp-next-diagnostic)
-  nmap <silent> <buffer> gp <plug>(lsp-previous-diagnostic)
-endfu
-augroup lsp_install
-  au!
-  autocmd User lsp_buffer_enabled call LspBufferMappings()
-augroup end
+nmap <silent> gd <plug>(lsp-definition)
+nmap <silent> gi <plug>(lsp-implementation)
+nmap <silent> gr <plug>(lsp-references)
+nmap <silent> gn <plug>(lsp-next-diagnostic)
+nmap <silent> gp <plug>(lsp-previous-diagnostic)
 
 " mattn/vim-lsp-settings
+let s:efm_filetypes =
+\ ['bash', 'javascript', 'javascriptreact', 'sh', 'typescriptreact', 'zsh']
 let g:lsp_settings_servers_dir = expand($HOME) . '/.lsp/servers'
 let g:lsp_settings_filetype_javascript =
-\ ['typescript-language-server', 'eslint-language-server']
+\ ['typescript-language-server', 'efm-langserver']
+let g:lsp_settings_filetype_javascriptreact = g:lsp_settings_filetype_javascript
 let g:lsp_settings_filetype_typescript = g:lsp_settings_filetype_javascript
-
-" dense-analysis/ale
-let g:ale_echo_msg_format = 'ALE: %[code] %%s'
-let g:ale_linters_explicit = 1
-let g:ale_set_balloons = 0
-let g:ale_set_highlights = 0
-let g:ale_sign_priority = 15
-let g:ale_sign_error = '✘❯'
-let g:ale_sign_warning = '▲❯'
-let g:ale_sign_style_error = '✘❯'
-let g:ale_sign_style_warning = '▲❯'
-let g:ale_linters = {
-\ 'bash': ['shellcheck'],
-\ 'rust': ['cargo'],
-\ 'sh': ['shellcheck'],
-\ 'zsh': ['shellcheck'],
+let g:lsp_settings_filetype_typescriptreact = g:lsp_settings_filetype_javascript
+let g:lsp_settings = {
+\ 'efm-langserver': {
+\   'allowlist': s:efm_filetypes,
+\   'cmd': [
+\     lsp_settings#exec_path('efm-langserver'),
+\     '-c',
+\     expand($HOME) . '/.config/efm-langserver/config.yaml',
+\   ],
+\   'disabled': !lsp_settings#executable('efm-langserver'),
+\ },
 \}
-let g:ale_fixers = {
-\ 'javascript': ['prettier'],
-\ 'rust': ['rustfmt'],
-\}
-let g:ale_pattern_options = {
-\ '\.min\.js$': { 'ale_linters': [], 'ale_fixers': [] },
-\ '\.min\.css$': { 'ale_linters': [], 'ale_fixers': [] },
-\}
-let g:ale_sh_shellcheck_exclusions = 'SC2148'
 
 " mengelbrecht/lightline-bufferline
 set showtabline=2
@@ -175,7 +180,7 @@ set laststatus=2
 let g:lightline = {
 \ 'active': {
 \   'left': [
-\     ['mode', 'paste', 'alestatus'],
+\     ['mode', 'paste', 'lspstatus'],
 \     ['readonly', 'fugitive', 'modified'],
 \   ],
 \   'right': [['lineinfo'], ['percent'], ['fileformat', 'filetype']],
@@ -189,7 +194,7 @@ let g:lightline = {
 \ 'component_expand': { 'buffers': 'lightline#bufferline#buffers' },
 \ 'component_function': {
 \   'fugitive': 'LightlineFugitive',
-\   'alestatus': 'LightlineALEStatus',
+\   'lspstatus': 'LspStatus',
 \ },
 \ 'component_type': { 'buffers': 'tabsel' },
 \ 'component_visible_condition': { 'fileformat': 'winwidth(0) > 70' },
@@ -204,43 +209,71 @@ let s:palette.tabline.tabsel = [['#1C1C1C', '#A67EA1', 234, 5]]
 " displays current git branch in lightline using vim-fugitive
 fu! LightlineFugitive()
   if exists('*FugitiveHead')
-    let branch = FugitiveHead()
-    return branch !=# '' ? "\u16A0 " . branch : ''
+    let l:branch = FugitiveHead()
+    return l:branch !=# '' ? "\u16A0 " . branch : ''
   endif
   return ''
 endfu
 
-" displays '$' or 'F' in lightline when ale is disabled or fix-enabled
-" TODO: update status and toggle to reflect LSP diagnostics too
-fu! LightlineALEStatus()
-  let is_ale_enabled = get(b:, 'ale_enabled', 1) && get(g:, 'ale_enabled', 0)
-  return is_ale_enabled ? (get(b:, 'ale_fix_on_save') ? 'Ｆ' : '') : '＄'
+" return '$' or 'F' when vim-lsp is disabled or formatting-enabled
+fu! LspStatus()
+  return lsp#internal#diagnostics#state#_is_enabled_for_buffer(bufnr('%')) ?
+    \ (get(b:, 'lsp_formatting_enabled') ? 'Ｆ' : '') : '＄'
 endfu
-nnoremap <silent> <leader>a :call ale#toggle#Toggle()<cr>
 
-" toggles ale's fix mode per buffer
-fu! ALEToggleFixMode()
-  let b:ale_fix_on_save = get(b:, 'ale_fix_on_save') ? 0 : 1
+" enable document formatting if vim-lsp is active and buffer variable is true
+fu! LspFormat()
+  if LspStatus() != 'Ｆ' | return | endif
+  if index(s:efm_filetypes, &ft) != -1
+    exe 'LspDocumentFormatSync --server=efm-langserver'
+  else
+    exe 'LspDocumentFormatSync'
+  endif
 endfu
-nnoremap <silent> <leader>z :call ALEToggleFixMode()<cr>
+autocmd BufWritePre * call LspFormat()
 
-" turn off syntax and linting if buffer is large
+" toggle vim-lsp per buffer
+fu! LspToggle()
+  let l:buf = bufnr('%')
+  if lsp#internal#diagnostics#state#_is_enabled_for_buffer(l:buf)
+    call lsp#disable_diagnostics_for_buffer(l:buf)
+  else
+    call lsp#enable_diagnostics_for_buffer(l:buf)
+  endif
+endfu
+nnoremap <silent> <leader>a :call LspToggle()<cr>
+
+" toggle vim-lsp's formatting per buffer
+fu! LspToggleFormatting()
+  let b:lsp_formatting_enabled = get(b:, 'lsp_formatting_enabled') ? 0 : 1
+endfu
+nnoremap <silent> <leader>z :call LspToggleFormatting()<cr>
+
+" suggest installing efm-langserver for supported filetypes to lint and format
+fu! LspSuggestEfmInstall()
+  if lsp_settings#executable('efm-langserver') | return | endif
+  redraw!
+  echohl Directory
+  unsilent echomsg 'Please do `:LspInstallServer efm-langserver` to enable linting'
+  echohl None
+endfu
+exe 'autocmd FileType ' . join(s:efm_filetypes, ',') . ' call LspSuggestEfmInstall()'
+
+" turn off syntax and language servers if buffer is large
 fu! IsLargeBuffer()
   if line2byte(line("$") + 1) > 1000000
     syntax clear
-    let b:ale_enabled = 0
+    call lsp#disable_diagnostics_for_buffer(bufnr('%'))
   endif
 endfu
-autocmd BufWinEnter * :call IsLargeBuffer()
+autocmd BufWinEnter * call IsLargeBuffer()
 
 " strip whitespace while preserving cursor position, for all non-markdown files
 fu! StripTrailingWhitespace()
-  if &ft =~ 'markdown'
-    return
-  endif
-  let l = line('.')
-  let c = col('.')
+  if &ft =~ 'markdown' | return | endif
+  let l:l = line('.')
+  let l:c = col('.')
   %s/\s\+$//e
-  call cursor(l, c)
+  call cursor(l:l, l:c)
 endfu
-autocmd BufWritePre * :call StripTrailingWhitespace()
+autocmd BufWritePre * call StripTrailingWhitespace()

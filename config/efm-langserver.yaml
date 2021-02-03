@@ -1,0 +1,50 @@
+version: 2
+root-markers:
+  - .git/
+
+tools:
+  javascript-eslint: &javascript-eslint
+    lint-command: 'npx eslint --format compact --stdin'
+    lint-formats:
+      - '%f: line %l, col %c, %trror - %m'
+      - '%f: line %l, col %c, %tarning - %m'
+    lint-ignore-exit-code: true
+    lint-stdin: true
+
+  javascript-prettier: &javascript-prettier
+    format-command: 'npx prettier'
+
+  sh-shellcheck: &sh-shellcheck
+    lint-command: 'shellcheck --format=gcc --external-sources --exclude=SC2148 -'
+    lint-formats:
+      - '%f:%l:%c: %trror: %m'
+      - '%f:%l:%c: %tnfo: %m'
+      - '%f:%l:%c: %tote: %m'
+      - '%f:%l:%c: %tarning: %m'
+    lint-stdin: true
+
+  sh-shfmt: &sh-shfmt
+    format-command: 'shfmt -bn -ci -i 2 -s -'
+    format-stdin: true
+
+languages:
+  bash:
+    - <<: *sh-shellcheck
+    - <<: *sh-shfmt
+  javascript:
+    - <<: *javascript-eslint
+    - <<: *javascript-prettier
+  javascriptreact:
+    - <<: *javascript-eslint
+    - <<: *javascript-prettier
+  sh:
+    - <<: *sh-shellcheck
+    - <<: *sh-shfmt
+  typescript:
+    - <<: *javascript-eslint
+    - <<: *javascript-prettier
+  typescriptreact:
+    - <<: *javascript-eslint
+    - <<: *javascript-prettier
+  zsh:
+    - <<: *sh-shellcheck
