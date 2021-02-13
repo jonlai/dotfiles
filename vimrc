@@ -3,7 +3,7 @@ set nocompatible
 " automatically install vim-plug if it does not exist
 if empty(glob('~/.vim/autoload/plug.vim'))
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-\   https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
@@ -14,7 +14,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'easymotion/vim-easymotion'
 Plug 'itchyny/lightline.vim'
-Plug 'jonlai/smyth.vim'
+Plug 'jonlai/smyth'
 Plug 'junegunn/fzf.vim'
 Plug 'mattn/vim-lsp-settings'
 Plug 'mengelbrecht/lightline-bufferline'
@@ -185,7 +185,7 @@ let g:lightline = {
 \   ],
 \   'right': [['lineinfo'], ['percent'], ['fileformat', 'filetype']],
 \ },
-\ 'colorscheme': 'powerline',
+\ 'colorscheme': 'smyth',
 \ 'component': {
 \   'fileformat': '%{winwidth(0) > 70 ? &fileformat : ""}',
 \   'lineinfo': "\u2632 %3l:%-2v",
@@ -201,18 +201,12 @@ let g:lightline = {
 \ 'tabline': { 'left': [['buffers']], 'right': [['fileencoding']] },
 \ 'tabline_subseparator': { 'left': '', 'right': '' },
 \}
-let s:palette = g:lightline#colorscheme#{g:lightline.colorscheme}#palette
-let s:palette.tabline.left = [['#8a8a8a', '#303030', 245, 236]]
-let s:palette.tabline.middle = [['#8a8a8a', '#303030', 245, 236]]
-let s:palette.tabline.tabsel = [['#1C1C1C', '#A67EA1', 234, 5]]
 
 " displays current git branch in lightline using vim-fugitive
 fu! LightlineFugitive()
-  if exists('*FugitiveHead')
-    let l:branch = FugitiveHead()
-    return l:branch !=# '' ? "\u16A0 " . branch : ''
-  endif
-  return ''
+  if !exists('*FugitiveHead') | return '' | endif
+  let l:branch = FugitiveHead()
+  return l:branch !=# '' ? "\u16A0 " . l:branch : ''
 endfu
 
 " return '$' or 'F' when vim-lsp is disabled or formatting-enabled
@@ -261,10 +255,9 @@ exe 'autocmd FileType ' . join(s:efm_filetypes, ',') . ' call LspSuggestEfmInsta
 
 " turn off syntax and language servers if buffer is large
 fu! IsLargeBuffer()
-  if line2byte(line("$") + 1) > 1000000
-    syntax clear
-    call lsp#disable_diagnostics_for_buffer(bufnr('%'))
-  endif
+  if line2byte(line("$") + 1) < 1000000 | return | endif
+  syntax clear
+  call lsp#disable_diagnostics_for_buffer(bufnr('%'))
 endfu
 autocmd BufWinEnter * call IsLargeBuffer()
 
