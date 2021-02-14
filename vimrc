@@ -107,10 +107,10 @@ nnoremap <silent> <c-space>j :TmuxNavigateDown<cr>
 nnoremap <silent> <c-space>k :TmuxNavigateUp<cr>
 nnoremap <silent> <c-space>l :TmuxNavigateRight<cr>
 nnoremap <silent> <c-space>x <c-w>q
-inoremap <silent> <c-space>h <esc>:TmuxNavigateLeft<cr>
-inoremap <silent> <c-space>j <esc>:TmuxNavigateDown<cr>
-inoremap <silent> <c-space>k <esc>:TmuxNavigateUp<cr>
-inoremap <silent> <c-space>l <esc>:TmuxNavigateRight<cr>
+inoremap <silent> <c-space>h <c-o>:TmuxNavigateLeft<cr>
+inoremap <silent> <c-space>j <c-o>:TmuxNavigateDown<cr>
+inoremap <silent> <c-space>k <c-o>:TmuxNavigateUp<cr>
+inoremap <silent> <c-space>l <c-o>:TmuxNavigateRight<cr>
 inoremap <silent> <c-space>x <esc><c-w>q
 
 " sheerun/vim-polyglot
