@@ -212,7 +212,7 @@ endfu
 " return '$' or 'F' when vim-lsp is disabled or formatting-enabled
 fu! LspStatus()
   return lsp#internal#diagnostics#state#_is_enabled_for_buffer(bufnr('%')) ?
-    \ (get(b:, 'lsp_formatting_enabled') ? 'Ｆ' : '') : '＄'
+  \ (get(b:, 'lsp_formatting_enabled') ? 'Ｆ' : '') : '＄'
 endfu
 
 " enable document formatting if vim-lsp is active and buffer variable is true
