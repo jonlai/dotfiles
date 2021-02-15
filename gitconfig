@@ -13,3 +13,5 @@
     rpull = pull --rebase
     branch-name = rev-parse --abbrev-ref HEAD
     pusho = "!git push --set-upstream origin $(git branch-name)"
+[init]
+    defaultBranch = main
