@@ -10,7 +10,7 @@ setopt vi
 
 # zinit setup
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-  command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin"
+  command git clone https://github.com/zdharma-continuum/zinit "$HOME/.zinit/bin"
 fi
 source "$HOME/.zinit/bin/zinit.zsh"
 autoload -Uz _zinit
