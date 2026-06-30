@@ -83,7 +83,7 @@ fi
 {
 ind='❯❯'
 rtc="%(?:%{$fg_bold[green]%}:%{$fg_bold[red]%})"
-PROMPT=' %{$fg_bold[cyan]%}%c $(git_prompt_info)${rtc}${ind}%{$reset_color%} '
+PROMPT=' %{$fg_bold[cyan]%}%c $(_omz_git_prompt_info)${rtc}${ind}%{$reset_color%} '
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%})%{$fg[yellow]%}✗ "
