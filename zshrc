@@ -9,10 +9,13 @@ export KEYTIMEOUT=1
 setopt vi
 
 # zinit setup
-if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-  command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin"
+export ZPFX="$HOME/.local"
+ZINIT_HOME="$HOME/.local/share/zinit/src"
+if [[ ! -d $ZINIT_HOME/.git ]]; then
+  mkdir -p "$(dirname $ZINIT_HOME)"
+  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 fi
-source "$HOME/.zinit/bin/zinit.zsh"
+source "$ZINIT_HOME/zinit.zsh"
 autoload -Uz _zinit
 # shellcheck disable=SC2034,SC2154
 (( ${+_comps} )) && _comps[zinit]=_zinit
@@ -22,25 +25,31 @@ zinit snippet OMZ::lib/completion.zsh
 zinit snippet OMZ::lib/git.zsh
 zinit snippet OMZ::lib/theme-and-appearance.zsh
 zinit light zsh-users/zsh-syntax-highlighting
-zinit ice from'gh-r' as'program' mv'ripgrep* -> dist' pick'dist/rg'
-zinit light BurntSushi/ripgrep
-zinit ice from'gh-r' as'program' mv'shellcheck* -> dist' pick'dist/shellcheck'
-zinit light koalaman/shellcheck
-zinit ice from'gh-r' as'program' mv'shfmt* -> shfmt'
-zinit light mvdan/sh
+
+zinit light zdharma-continuum/zinit-annex-bin-gem-node
+zinit from'gh-r' sbin'**/rg -> rg' for BurntSushi/ripgrep
+zinit from'gh-r' sbin'fzf* -> fzf' for junegunn/fzf
+zinit from'gh-r' sbin'shellcheck* -> shellcheck' for koalaman/shellcheck
+zinit from'gh-r' sbin'**/sh* -> shfmt' for @mvdan/sh
+
+# homebrew
+if [[ -f /opt/homebrew/bin/brew ]]; then
+  export PATH="/opt/homebrew/bin:$PATH"
+  eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+fi
+
+# zinit's sbin directory
+[[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$PATH:$HOME/.local/bin"
+
+# rust cargo
+[[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]] && export PATH="$PATH:$HOME/.cargo/bin"
+
+# dart/flutter pub-cache
+[[ ":$PATH:" != *":$HOME/.pub-cache/bin:"* ]] && export PATH="$PATH:$HOME/.pub-cache/bin"
 
 # fzf
-if [[ ! -f $HOME/.fzf/bin/fzf ]]; then
-  command git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
-  command "$HOME/.fzf/install" --bin
-fi
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --glob "!.git/*"'
-source "$HOME/.fzf/shell/completion.zsh"
-source "$HOME/.fzf/shell/key-bindings.zsh"
-
-# path
-[[ ":$PATH:" != *":$HOME/.fzf/bin:"* ]] && export PATH="$PATH:$HOME/.fzf/bin"
-[[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]] && export PATH="$PATH:$HOME/.cargo/bin"
+source <(fzf --zsh)
 
 # aliases
 alias ll='ls -lh'
@@ -48,7 +57,7 @@ alias lla='ls -lAh'
 alias cdr='cd $(git rev-parse --show-toplevel 2>/dev/null)'
 
 # history
-[[ -z "$HISTFILE" ]] && export HISTFILE=$HOME/.zsh_history
+[[ -z "$HISTFILE" ]] && export HISTFILE=$ZDOTDIR/.zsh_history
 export HISTSIZE=25000
 export SAVEHIST=$HISTSIZE
 setopt append_history
@@ -83,7 +92,7 @@ fi
 {
 ind='❯❯'
 rtc="%(?:%{$fg_bold[green]%}:%{$fg_bold[red]%})"
-PROMPT=' %{$fg_bold[cyan]%}%c $(git_prompt_info)${rtc}${ind}%{$reset_color%} '
+PROMPT=' %{$fg_bold[cyan]%}%c $(_omz_git_prompt_info)${rtc}${ind}%{$reset_color%} '
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg_bold[blue]%}(%{$fg[red]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%})%{$fg[yellow]%}✗ "
