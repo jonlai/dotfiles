@@ -4,7 +4,8 @@
 stty -ixon
 export PAGER='less'
 export LESS='-R'
-export EDITOR='vim'
+export EDITOR='nvim'
+export VISUAL='nvim'
 export KEYTIMEOUT=1
 setopt vi
 
@@ -52,6 +53,8 @@ export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --glob "!.git/*"'
 source <(fzf --zsh)
 
 # aliases
+alias vim='nvim'
+alias avim='/opt/homebrew/bin/vim'
 alias ll='ls -lh'
 alias lla='ls -lAh'
 alias cdr='cd $(git rev-parse --show-toplevel 2>/dev/null)'

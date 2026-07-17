@@ -4,7 +4,7 @@
     name = Jon Lai
     email = jonathan@jonlai.com
 [core]
-    editor = vim
+    editor = nvim
     excludesfile = ~/.gitignore
 [alias]
     st = status
