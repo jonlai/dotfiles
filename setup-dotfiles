@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# source -> destination
+LINKS=(
+  "zshenv:.zshenv"
+  "config/git/config:.config/git/config"
+  "config/git/ignore:.config/git/ignore"
+  "config/nvim/init.lua:.config/nvim/init.lua"
+  "config/nvim/lsp:.config/nvim/lsp"
+  "config/tmux/tmux.conf:.config/tmux/tmux.conf"
+  "config/vim/vimrc:.config/vim/vimrc"
+  "config/zsh/zshrc:.config/zsh/.zshrc"
+  "config/ghostty/config.ghostty:.config/ghostty/config.ghostty"
+)
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+link() {
+  local src="$DOTFILES_DIR/$1"
+  local dest="$HOME/$2"
+
+  if [ ! -e "$src" ]; then
+    echo "skip:   $src (source missing)"
+    return
+  fi
+
+  mkdir -p "$(dirname "$dest")"
+
+  if [ -L "$dest" ]; then
+    if [ "$(readlink "$dest")" = "$src" ]; then
+      echo "skip:   $dest (already linked to source)"
+      return
+    fi
+    echo "relink: $dest (was -> $(readlink "$dest"))"
+    rm "$dest"
+  elif [ -e "$dest" ]; then
+    local backup="$dest.bak.$(date +%Y%m%d%H%M%S)"
+    echo "backup: $dest -> $backup"
+    mv "$dest" "$backup"
+  fi
+
+  ln -s "$src" "$dest"
+  echo "link:   $dest -> $src"
+}
+
+for entry in "${LINKS[@]}"; do
+  link "${entry%%:*}" "${entry#*:}"
+done
