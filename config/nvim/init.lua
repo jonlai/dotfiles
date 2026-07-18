@@ -8,6 +8,11 @@ vim.pack.add({
   "https://github.com/nvim-lualine/lualine.nvim",
   "https://github.com/tpope/vim-fugitive",
   "https://github.com/tpope/vim-sleuth",
+  -- lsp-specific plugins
+  "https://github.com/mason-org/mason.nvim",
+  "https://github.com/mason-org/mason-lspconfig.nvim",
+  "https://github.com/neovim/nvim-lspconfig",
+  "https://github.com/WhoIsSethDaniel/mason-tool-installer.nvim",
 });
 
 -- general settings
@@ -52,6 +57,52 @@ end)
 -- jonlai/smyth
 vim.cmd("colorscheme smyth")
 
+-- diagnostics
+vim.diagnostic.config {
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "✘❯",
+      [vim.diagnostic.severity.WARN] = "▲❯",
+      [vim.diagnostic.severity.HINT] = "◆❯",
+      [vim.diagnostic.severity.INFO] = "◆❯",
+    },
+  },
+}
+vim.keymap.set("n", "gl", vim.diagnostic.setloclist)
+vim.keymap.set("n", "gn", function()
+  vim.diagnostic.jump({ count = 1, float = true })
+end)
+vim.keymap.set("n", "gp", function()
+  vim.diagnostic.jump({ count = -1, float = true })
+end)
+
+-- lsp configuration, specific plugin order required
+require("mason").setup()
+require("mason-tool-installer").setup {
+  ensure_installed = {
+    "jsonls",
+    "lua_ls",
+    "prettier",
+    "ts_ls",
+  },
+}
+require("mason-lspconfig").setup {
+  automatic_enable = {
+    exclude = {
+      "dartls",
+      "rust_analyzer",
+      "ts_ls",
+    },
+  },
+}
+vim.lsp.enable({
+  "ts_ls",
+  "dartls",
+})
+vim.keymap.set("n", "gd", vim.lsp.buf.type_definition)
+vim.keymap.set("n", "gi", vim.lsp.buf.implementation)
+vim.keymap.set("n", "gr", vim.lsp.buf.references)
+
 -- airblade/vim-gitgutter
 vim.g.gitgutter_map_keys = 0
 vim.g.gitgutter_sign_priority = 5
@@ -89,11 +140,17 @@ require("lualine").setup {
     lualine_a = {"mode"},
     lualine_b = {
       { "branch", icons_enabled = true, icon = "" },
-      "diagnostics",
     },
-    lualine_c = {"lsp_status"},
-    lualine_x = {"fileformat", "filetype"},
-    lualine_y = {"progress"},
+    lualine_c = {
+      {
+        "diagnostics",
+        symbols = { error = "✘:", warn = "▲:", info = "◆:", hint = "◆:" },
+
+      },
+      "lsp_status"
+    },
+    lualine_x = { "fileformat", "filetype" },
+    lualine_y = { "progress" },
     lualine_z = {
       { "location", icons_enabled = true, icon = "\u{2632}" },
     },
