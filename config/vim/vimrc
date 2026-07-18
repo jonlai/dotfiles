@@ -1,14 +1,14 @@
 set nocompatible
 
 " automatically install vim-plug if it does not exist
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+if empty(glob('~/.config/vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs
   \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " initialize vim plugins using vim-plug
-call plug#begin('~/.vim/plugged')
+call plug#begin('~/.config/vim/plugged')
 
 Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-tmux-navigator'
@@ -44,6 +44,7 @@ set wildmenu
 set updatetime=500
 set colorcolumn=81,101
 set clipboard=unnamed
+set viminfo+=n~/.config/vim/viminfo
 
 " indentation
 set shiftround
@@ -92,7 +93,7 @@ nnoremap <silent> <leader>x :TComment<cr>
 vnoremap <silent> <leader>x :TComment<cr>
 
 " junegunn/fzf.vim
-set rtp+=~/.fzf
+set rtp+=~/.local/bin
 cnoreabbrev fzf FZF
 nnoremap <silent> <leader>l :Lines<cr>
 nnoremap <silent> <leader>d :GFiles<cr>
