@@ -4,8 +4,8 @@ vim.pack.add({
   "https://github.com/alexghergh/nvim-tmux-navigation",
   "https://github.com/folke/flash.nvim",
   "https://github.com/ibhagwan/fzf-lua",
-  "https://github.com/jonlai/smyth",
   "https://github.com/nvim-lualine/lualine.nvim",
+  "https://github.com/rebelot/kanagawa.nvim",
   "https://github.com/tpope/vim-fugitive",
   "https://github.com/tpope/vim-sleuth",
   -- lsp-specific plugins
@@ -54,8 +54,16 @@ vim.keymap.set("n", "<leader>h", function()
   vim.opt.hlsearch = not vim.opt.hlsearch:get()
 end)
 
--- jonlai/smyth
-vim.cmd("colorscheme smyth")
+-- rebelot/kanagawa.nvim
+require("kanagawa").setup {
+  theme = "wave",
+  colors = {
+    theme = {
+      all = { ui = { bg_gutter = "none" } },
+    },
+  },
+}
+vim.cmd("colorscheme kanagawa")
 
 -- diagnostics
 vim.diagnostic.config {
@@ -129,7 +137,7 @@ vim.keymap.set("n", "<leader>g", "<cmd>FzfLua git_files<cr>", { silent = true })
 require("lualine").setup {
   options = {
     icons_enabled = false,
-    theme = "smyth",
+    theme = "kanagawa",
     component_separators = { left = "|", right = "|"},
     section_separators = { left = "", right = ""},
     always_divide_middle = true,
@@ -166,7 +174,7 @@ require("lualine").setup {
       {
         "buffers",
         buffers_color = {
-          active = "lualine_a_replace",
+          active = "lualine_a_visual",
           inactive = "lualine_c_normal",
         },
         symbols = { modified = "✱", alternate_file = "", directory = "" },
