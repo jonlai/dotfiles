@@ -5,6 +5,7 @@ vim.pack.add({
   "https://github.com/folke/flash.nvim",
   "https://github.com/ibhagwan/fzf-lua",
   "https://github.com/nvim-lualine/lualine.nvim",
+  "https://github.com/nvim-mini/mini.nvim",
   "https://github.com/rebelot/kanagawa.nvim",
   "https://github.com/tpope/vim-fugitive",
   "https://github.com/tpope/vim-sleuth",
@@ -23,6 +24,8 @@ vim.opt.updatetime = 500
 vim.opt.colorcolumn = "81,101"
 
 -- indentation
+vim.opt.autoindent = true
+vim.opt.smartindent = true
 vim.opt.shiftround = true
 vim.opt.expandtab = true
 
@@ -110,6 +113,12 @@ vim.lsp.enable({
 vim.keymap.set("n", "gd", vim.lsp.buf.type_definition)
 vim.keymap.set("n", "gi", vim.lsp.buf.implementation)
 vim.keymap.set("n", "gr", vim.lsp.buf.references)
+
+-- nvim-mini/mini.nvim
+require("mini.icons").setup()
+require("mini.completion").setup()
+require("mini.snippets").setup()
+require("mini.indentscope").setup()
 
 -- airblade/vim-gitgutter
 vim.g.gitgutter_map_keys = 0
